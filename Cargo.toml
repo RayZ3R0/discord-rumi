@@ -1,0 +1,62 @@
+[package]
+name = "discord-twilight"
+version = "0.1.0"
+edition = "2021"
+description = "Production-grade Discord bot using serenity + poise"
+rust-version = "1.74"
+
+[dependencies]
+# ── Discord ────────────────────────────────────────────────────────────────────
+# Poise wraps serenity and provides the slash command framework. We declare
+# serenity explicitly so we can control its feature flags independently of
+# what poise enables by default.
+poise = "0.6"
+
+# Serenity with cache enabled but configured for minimal RAM usage.
+# We disable default-features to take full control over what is compiled in.
+# The `cache` feature is kept — it is needed for guild metadata queries and
+# the current-user object, but we cap max_messages=0 to prevent per-channel
+# message caching which is the #1 source of memory growth at scale.
+serenity = { version = "0.12", default-features = false, features = [
+    "builder",
+    "cache",
+    "client",
+    "gateway",
+    "http",
+    "model",
+    "utils",
+    "rustls_backend",
+] }
+
+# ── Async runtime ──────────────────────────────────────────────────────────────
+tokio = { version = "1", features = ["full"] }
+
+# ── Observability ──────────────────────────────────────────────────────────────
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+
+# ── HTTP client (outbound, non-Discord requests) ───────────────────────────────
+# reqwest is already a transitive dependency via serenity; declaring it
+# explicitly pins the version and gives us direct access in AppData.
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
+
+# ── Configuration ──────────────────────────────────────────────────────────────
+dotenvy = "0.15"
+
+# ── Error handling ─────────────────────────────────────────────────────────────
+anyhow = "1"
+
+# ── Command hash-based auto-registration ──────────────────────────────────────
+sha2 = "0.10"
+hex = "0.4"
+serde_json = "1"
+
+[profile.release]
+# Link-time optimisation — smaller, faster binary on constrained hosting.
+lto = true
+# Single codegen unit maximises inlining at the cost of compile time.
+codegen-units = 1
+# Abort on panic — smaller binary, no unwinding overhead at runtime.
+panic = "abort"
+# Strip debug symbols from release binary to reduce file size.
+strip = "symbols"

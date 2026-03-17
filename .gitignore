@@ -1,0 +1,21 @@
+# Build output
+/target
+
+# Secrets — never commit these
+.env
+
+# Runtime state
+.command_hash
+
+# Log files
+*.log
+
+# Editor / IDE artifacts
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# macOS metadata
+.DS_Store
