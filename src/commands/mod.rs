@@ -1,6 +1,8 @@
 use crate::data::AppData;
 use crate::error::Error;
 
+pub mod anime;
+pub mod react;
 pub mod utility;
 
 /// Returns the complete list of poise commands registered with the framework.
@@ -23,8 +25,7 @@ pub mod utility;
 pub fn all() -> Vec<poise::Command<AppData, Error>> {
     vec![
         utility::ping::ping(),
-        // ── Add new commands here ──────────────────────────────────────────
-        // utility::help::help(),
-        // moderation::ban::ban(),
+        anime::anime(),
+        react::react(),
     ]
 }

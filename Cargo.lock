@@ -318,6 +318,7 @@ dependencies = [
  "hex",
  "poise",
  "reqwest",
+ "serde",
  "serde_json",
  "serenity",
  "sha2",
