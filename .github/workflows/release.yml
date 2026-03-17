@@ -10,7 +10,7 @@ permissions:
   contents: write   # needed to create the GitHub Release and upload assets
 
 env:
-  BINARY_NAME: discord-twilight
+  BINARY_NAME: discord-rumi
   CARGO_TERM_COLOR: always
 
 jobs:
@@ -154,6 +154,6 @@ jobs:
           # Auto-generates changelog from commits since the previous tag.
           generate_release_notes: true
           files: |
-            discord-twilight-x86_64-linux-gnu
-            discord-twilight-x86_64-linux-musl
-            discord-twilight-aarch64-linux-gnu
+            discord-rumi-x86_64-linux-gnu
+            discord-rumi-x86_64-linux-musl
+            discord-rumi-aarch64-linux-gnu

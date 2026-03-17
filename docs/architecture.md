@@ -2,7 +2,7 @@
 
 ## Overview
 
-`discord-twilight` is a production-grade Discord bot built on **serenity** + **poise**. It is designed to run on low-resource hosting (shared VPS, single-core container) while serving 200–300 guilds efficiently.
+`discord-rumi` is a production-grade Discord bot built on **serenity** + **poise**. It is designed to run on low-resource hosting (shared VPS, single-core container) while serving 200–300 guilds efficiently.
 
 ---
 

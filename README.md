@@ -2,6 +2,8 @@
 
 A production-grade Discord bot built with Rust, [serenity](https://github.com/serenity-rs/serenity) and [poise](https://github.com/serenity-rs/poise). Designed to run efficiently on low-resource hosting — a single shared VPS serving hundreds of servers with a modest memory footprint.
 
+The binary is named `discord-rumi`, released via [RayZ3R0/discord-rumi](https://github.com/RayZ3R0/discord-rumi).
+
 ---
 
 ## Features
@@ -36,9 +38,9 @@ Prebuilt binaries for each release are attached to the [GitHub Releases](../../r
 
 | Filename | Target | Use case |
 |---|---|---|
-| `discord-twilight-x86_64-linux-gnu` | x86-64, dynamically linked | Standard Linux VPS or server |
-| `discord-twilight-x86_64-linux-musl` | x86-64, fully static | Any Linux host, no libc dependency |
-| `discord-twilight-aarch64-linux-gnu` | ARM 64-bit | Raspberry Pi, ARM VPS |
+| `discord-rumi-x86_64-linux-gnu` | x86-64, dynamically linked | Standard Linux VPS or server |
+| `discord-rumi-x86_64-linux-musl` | x86-64, fully static | Any Linux host, no libc dependency |
+| `discord-rumi-aarch64-linux-gnu` | ARM 64-bit | Raspberry Pi, ARM VPS |
 
 If you are unsure which to pick, use the `musl` build — it is fully self-contained and runs on any Linux system without installing additional libraries.
 
@@ -46,8 +48,8 @@ If you are unsure which to pick, use the `musl` build — it is fully self-conta
 
 ```bash
 # Replace v0.1.0 and the filename with the version and target you want
-wget https://github.com/RayZ3R0/discord-rumi/releases/download/v0.1.0/discord-twilight-x86_64-linux-musl
-chmod +x discord-twilight-x86_64-linux-musl
+wget https://github.com/RayZ3R0/discord-rumi/releases/download/v0.1.0/discord-rumi-x86_64-linux-musl
+chmod +x discord-rumi-x86_64-linux-musl
 ```
 
 ### Step 2 — Create a `.env` file
@@ -89,7 +91,7 @@ COMMAND_HASH_PATH=.command_hash
 ### Step 3 — Run the bot
 
 ```bash
-./discord-twilight-x86_64-linux-musl
+./discord-rumi-x86_64-linux-musl
 ```
 
 The bot will log its startup sequence, connect to Discord, and register slash commands if the definitions have changed since the last run:
@@ -122,7 +124,7 @@ Wants=network-online.target
 Type=simple
 User=discord
 WorkingDirectory=/opt/discord-rumi
-ExecStart=/opt/discord-rumi/discord-twilight-x86_64-linux-musl
+ExecStart=/opt/discord-rumi/discord-rumi-x86_64-linux-musl
 Restart=on-failure
 RestartSec=5
 # Pass secrets via environment directly instead of a .env file if preferred:
@@ -155,7 +157,7 @@ cd discord-rumi
 cargo build --release
 ```
 
-The release binary will be at `target/release/discord-twilight`.
+The release binary will be at `target/release/discord-rumi`.
 
 ### Development run
 

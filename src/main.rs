@@ -1,4 +1,4 @@
-//! discord-twilight — production-grade Discord bot
+//! discord-rumi — production-grade Discord bot
 //!
 //! ## Startup sequence
 //!
@@ -44,7 +44,7 @@ async fn main() {
             tracing_subscriber::EnvFilter::try_from_default_env()
                 .unwrap_or_else(|_| {
                     tracing_subscriber::EnvFilter::new(
-                        "discord_twilight=info,serenity=warn,poise=warn",
+                        "discord_rumi=info,serenity=warn,poise=warn",
                     )
                 }),
         )
