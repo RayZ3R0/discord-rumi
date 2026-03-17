@@ -3,6 +3,7 @@ name = "discord-rumi"
 version = "0.1.0"
 edition = "2021"
 description = "Production-grade Discord bot using serenity + poise"
+authors = ["RayZ3R0"]
 rust-version = "1.74"
 
 [dependencies]
