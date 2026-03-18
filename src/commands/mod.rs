@@ -1,6 +1,7 @@
 use crate::data::AppData;
 use crate::error::Error;
 
+pub mod anilist;
 pub mod anime;
 pub mod react;
 pub mod utility;
@@ -27,5 +28,6 @@ pub fn all() -> Vec<poise::Command<AppData, Error>> {
         utility::ping::ping(),
         anime::anime(),
         react::react(),
+        anilist::animelist::animelist(),
     ]
 }

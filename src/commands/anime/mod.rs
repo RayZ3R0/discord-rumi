@@ -38,6 +38,16 @@ struct NekosResult {
     anime_name: Option<String>,
 }
 
+/// Escape markdown characters in user-provided text to prevent unintended formatting.
+/// This escapes *, _, ~, `, and other Discord markdown characters.
+fn escape_markdown(text: &str) -> String {
+    text.replace('_', "\\_")
+        .replace('*', "\\*")
+        .replace('~', "\\~")
+        .replace('`', "\\`")
+        .replace('>', "\\>")
+}
+
 pub(crate) async fn nekos_gif(
     ctx: Context<'_>,
     category: &str,
@@ -79,7 +89,7 @@ pub(crate) async fn send_reaction(
         .color(color);
 
     if let Some(name) = anime_name {
-        embed = embed.footer(serenity::CreateEmbedFooter::new(name));
+        embed = embed.footer(serenity::CreateEmbedFooter::new(escape_markdown(&name)));
     }
 
     ctx.send(poise::CreateReply::default().embed(embed)).await?;
@@ -113,7 +123,7 @@ pub async fn anime(_ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn smile(ctx: Context<'_>) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "smile").await?;
-    let a = ctx.author().display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_HAPPY, format!("**{a}** smiles warmly 😊")).await
 }
 
@@ -121,7 +131,7 @@ pub async fn smile(ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn laugh(ctx: Context<'_>) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "laugh").await?;
-    let a = ctx.author().display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_HAPPY, format!("**{a}** can't stop laughing 😂")).await
 }
 
@@ -129,7 +139,7 @@ pub async fn laugh(ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn blush(ctx: Context<'_>) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "blush").await?;
-    let a = ctx.author().display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_HAPPY, format!("**{a}** is absolutely flustered 😳")).await
 }
 
@@ -137,7 +147,7 @@ pub async fn blush(ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn happy(ctx: Context<'_>) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "happy").await?;
-    let a = ctx.author().display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_HAPPY, format!("**{a}** is so happy right now! 🎉")).await
 }
 
@@ -145,7 +155,7 @@ pub async fn happy(ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn wink(ctx: Context<'_>) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "wink").await?;
-    let a = ctx.author().display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_HAPPY, format!("**{a}** gives a cheeky wink 😉")).await
 }
 
@@ -153,7 +163,7 @@ pub async fn wink(ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn wave(ctx: Context<'_>) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "wave").await?;
-    let a = ctx.author().display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_HAPPY, format!("**{a}** waves! 👋")).await
 }
 
@@ -161,7 +171,7 @@ pub async fn wave(ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn salute(ctx: Context<'_>) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "salute").await?;
-    let a = ctx.author().display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_HAPPY, format!("**{a}** salutes. o7")).await
 }
 
@@ -169,7 +179,7 @@ pub async fn salute(ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn thumbsup(ctx: Context<'_>) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "thumbsup").await?;
-    let a = ctx.author().display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_HAPPY, format!("**{a}** gives a big thumbs up 👍")).await
 }
 
@@ -177,7 +187,7 @@ pub async fn thumbsup(ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn nod(ctx: Context<'_>) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "nod").await?;
-    let a = ctx.author().display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_HAPPY, format!("**{a}** nods. Understood.")).await
 }
 
@@ -185,7 +195,7 @@ pub async fn nod(ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn dance(ctx: Context<'_>) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "dance").await?;
-    let a = ctx.author().display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_HAPPY, format!("**{a}** breaks into a dance 🕺")).await
 }
 
@@ -197,7 +207,7 @@ pub async fn dance(ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn cry(ctx: Context<'_>) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "cry").await?;
-    let a = ctx.author().display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_SAD, format!("**{a}** is crying... 😢")).await
 }
 
@@ -205,7 +215,7 @@ pub async fn cry(ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn pout(ctx: Context<'_>) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "pout").await?;
-    let a = ctx.author().display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_SAD, format!("**{a}** is pouting 😤")).await
 }
 
@@ -213,7 +223,7 @@ pub async fn pout(ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn bored(ctx: Context<'_>) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "bored").await?;
-    let a = ctx.author().display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_SAD, format!("**{a}** is bored out of their mind...")).await
 }
 
@@ -221,7 +231,7 @@ pub async fn bored(ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn facepalm(ctx: Context<'_>) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "facepalm").await?;
-    let a = ctx.author().display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_SAD, format!("**{a}** facepalms. Why is everyone like this.")).await
 }
 
@@ -229,7 +239,7 @@ pub async fn facepalm(ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn confused(ctx: Context<'_>) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "confused").await?;
-    let a = ctx.author().display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_SAD, format!("**{a}** has absolutely no idea what is going on")).await
 }
 
@@ -237,7 +247,7 @@ pub async fn confused(ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn shocked(ctx: Context<'_>) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "shocked").await?;
-    let a = ctx.author().display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_SAD, format!("**{a}** is utterly shocked 😱")).await
 }
 
@@ -249,7 +259,7 @@ pub async fn shocked(ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn sleep(ctx: Context<'_>) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "sleep").await?;
-    let a = ctx.author().display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_CALM, format!("**{a}** has fallen asleep. Do not disturb. 💤")).await
 }
 
@@ -257,7 +267,7 @@ pub async fn sleep(ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn yawn(ctx: Context<'_>) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "yawn").await?;
-    let a = ctx.author().display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_CALM, format!("**{a}** lets out a big yawn. Someone's tired...")).await
 }
 
@@ -265,7 +275,7 @@ pub async fn yawn(ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn stare(ctx: Context<'_>) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "stare").await?;
-    let a = ctx.author().display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_CALM, format!("**{a}** stares off into the distance...")).await
 }
 
@@ -273,7 +283,7 @@ pub async fn stare(ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn think(ctx: Context<'_>) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "think").await?;
-    let a = ctx.author().display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_CALM, format!("**{a}** is deep in thought 🤔")).await
 }
 
@@ -281,7 +291,7 @@ pub async fn think(ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn sip(ctx: Context<'_>) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "sip").await?;
-    let a = ctx.author().display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_CALM, format!("**{a}** takes a long, peaceful sip ☕")).await
 }
 
@@ -289,7 +299,7 @@ pub async fn sip(ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn shrug(ctx: Context<'_>) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "shrug").await?;
-    let a = ctx.author().display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_CALM, format!("**{a}** shrugs. ¯\\_(ツ)_/¯")).await
 }
 
@@ -297,7 +307,7 @@ pub async fn shrug(ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn nope(ctx: Context<'_>) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "nope").await?;
-    let a = ctx.author().display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_CALM, format!("**{a}** says: nope. Not today.")).await
 }
 
@@ -305,7 +315,7 @@ pub async fn nope(ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn smug(ctx: Context<'_>) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "smug").await?;
-    let a = ctx.author().display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_CALM, format!("**{a}** gives their smuggest look 😏")).await
 }
 
@@ -313,6 +323,6 @@ pub async fn smug(ctx: Context<'_>) -> Result<(), Error> {
 #[poise::command(slash_command)]
 pub async fn lurk(ctx: Context<'_>) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "lurk").await?;
-    let a = ctx.author().display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_CALM, format!("**{a}** lurks silently...")).await
 }

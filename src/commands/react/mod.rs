@@ -15,6 +15,16 @@ use crate::error::Error;
 
 type Context<'a> = poise::Context<'a, AppData, Error>;
 
+/// Escape markdown characters in user-provided text to prevent unintended formatting.
+/// This escapes *, _, ~, `, and other Discord markdown characters.
+fn escape_markdown(text: &str) -> String {
+    text.replace('_', "\\_")
+        .replace('*', "\\*")
+        .replace('~', "\\~")
+        .replace('`', "\\`")
+        .replace('>', "\\>")
+}
+
 // ── Pastel color palette ─────────────────────────────────────────────────────
 
 /// Warm / affectionate — soft rose
@@ -56,8 +66,8 @@ pub async fn hug(
     #[description = "Who do you want to hug?"] user: serenity::User,
 ) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "hug").await?;
-    let a = ctx.author().display_name().to_string();
-    let b = user.display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
+    let b = escape_markdown(&user.display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_WARM, format!("**{a}** wraps their arms around **{b}**")).await
 }
 
@@ -68,8 +78,8 @@ pub async fn cuddle(
     #[description = "Who do you want to cuddle?"] user: serenity::User,
 ) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "cuddle").await?;
-    let a = ctx.author().display_name().to_string();
-    let b = user.display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
+    let b = escape_markdown(&user.display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_WARM, format!("**{a}** cuddles up with **{b}**")).await
 }
 
@@ -80,8 +90,8 @@ pub async fn kiss(
     #[description = "Who do you want to kiss?"] user: serenity::User,
 ) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "kiss").await?;
-    let a = ctx.author().display_name().to_string();
-    let b = user.display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
+    let b = escape_markdown(&user.display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_WARM, format!("**{a}** kisses **{b}** 💋")).await
 }
 
@@ -92,8 +102,8 @@ pub async fn peck(
     #[description = "Who do you want to peck?"] user: serenity::User,
 ) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "peck").await?;
-    let a = ctx.author().display_name().to_string();
-    let b = user.display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
+    let b = escape_markdown(&user.display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_WARM, format!("**{a}** gives **{b}** a quick peck on the cheek")).await
 }
 
@@ -104,8 +114,8 @@ pub async fn blowkiss(
     #[description = "Who are you blowing a kiss at?"] user: serenity::User,
 ) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "blowkiss").await?;
-    let a = ctx.author().display_name().to_string();
-    let b = user.display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
+    let b = escape_markdown(&user.display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_WARM, format!("**{a}** blows a kiss at **{b}** 💨💋")).await
 }
 
@@ -116,8 +126,8 @@ pub async fn pat(
     #[description = "Who do you want to pat?"] user: serenity::User,
 ) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "pat").await?;
-    let a = ctx.author().display_name().to_string();
-    let b = user.display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
+    let b = escape_markdown(&user.display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_WARM, format!("**{a}** gives **{b}** headpats")).await
 }
 
@@ -128,8 +138,8 @@ pub async fn handhold(
     #[description = "Whose hand do you want to hold?"] user: serenity::User,
 ) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "handhold").await?;
-    let a = ctx.author().display_name().to_string();
-    let b = user.display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
+    let b = escape_markdown(&user.display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_WARM, format!("**{a}** holds **{b}**'s hand")).await
 }
 
@@ -140,8 +150,8 @@ pub async fn lappillow(
     #[description = "Whose lap do you want to use as a pillow?"] user: serenity::User,
 ) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "lappillow").await?;
-    let a = ctx.author().display_name().to_string();
-    let b = user.display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
+    let b = escape_markdown(&user.display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_WARM, format!("**{a}** uses **{b}**'s lap as a pillow")).await
 }
 
@@ -152,8 +162,8 @@ pub async fn carry(
     #[description = "Who do you want to carry?"] user: serenity::User,
 ) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "carry").await?;
-    let a = ctx.author().display_name().to_string();
-    let b = user.display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
+    let b = escape_markdown(&user.display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_WARM, format!("**{a}** picks up **{b}** and carries them")).await
 }
 
@@ -164,8 +174,8 @@ pub async fn feed(
     #[description = "Who do you want to feed?"] user: serenity::User,
 ) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "feed").await?;
-    let a = ctx.author().display_name().to_string();
-    let b = user.display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
+    let b = escape_markdown(&user.display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_WARM, format!("**{a}** feeds **{b}** — say aah!")).await
 }
 
@@ -176,8 +186,8 @@ pub async fn kabedon(
     #[description = "Who are you kabedon-ing?"] user: serenity::User,
 ) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "kabedon").await?;
-    let a = ctx.author().display_name().to_string();
-    let b = user.display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
+    let b = escape_markdown(&user.display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_WARM, format!("**{a}** kabedon's **{b}** against the wall")).await
 }
 
@@ -188,8 +198,8 @@ pub async fn wag(
     #[description = "Who are you wagging your tail at?"] user: serenity::User,
 ) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "wag").await?;
-    let a = ctx.author().display_name().to_string();
-    let b = user.display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
+    let b = escape_markdown(&user.display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_WARM, format!("**{a}** wags their tail happily at **{b}**")).await
 }
 
@@ -200,8 +210,8 @@ pub async fn highfive(
     #[description = "Who do you want to high-five?"] user: serenity::User,
 ) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "highfive").await?;
-    let a = ctx.author().display_name().to_string();
-    let b = user.display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
+    let b = escape_markdown(&user.display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_WARM, format!("**{a}** high-fives **{b}** 🙌")).await
 }
 
@@ -212,8 +222,8 @@ pub async fn handshake(
     #[description = "Who do you want to shake hands with?"] user: serenity::User,
 ) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "handshake").await?;
-    let a = ctx.author().display_name().to_string();
-    let b = user.display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
+    let b = escape_markdown(&user.display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_WARM, format!("**{a}** shakes hands with **{b}**")).await
 }
 
@@ -228,8 +238,8 @@ pub async fn tickle(
     #[description = "Who do you want to tickle?"] user: serenity::User,
 ) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "tickle").await?;
-    let a = ctx.author().display_name().to_string();
-    let b = user.display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
+    let b = escape_markdown(&user.display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_PLAYFUL, format!("**{a}** tickles **{b}** — no mercy!")).await
 }
 
@@ -240,8 +250,8 @@ pub async fn poke(
     #[description = "Who do you want to poke?"] user: serenity::User,
 ) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "poke").await?;
-    let a = ctx.author().display_name().to_string();
-    let b = user.display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
+    let b = escape_markdown(&user.display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_PLAYFUL, format!("**{a}** pokes **{b}** 👉")).await
 }
 
@@ -252,8 +262,8 @@ pub async fn bonk(
     #[description = "Who deserves a bonk?"] user: serenity::User,
 ) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "bonk").await?;
-    let a = ctx.author().display_name().to_string();
-    let b = user.display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
+    let b = escape_markdown(&user.display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_PLAYFUL, format!("**{a}** bonks **{b}** on the head. Horny jail.")).await
 }
 
@@ -264,8 +274,8 @@ pub async fn baka(
     #[description = "Who's the baka?"] user: serenity::User,
 ) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "baka").await?;
-    let a = ctx.author().display_name().to_string();
-    let b = user.display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
+    let b = escape_markdown(&user.display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_PLAYFUL, format!("**{a}** calls **{b}** a baka! BAKA!")).await
 }
 
@@ -276,8 +286,8 @@ pub async fn yeet(
     #[description = "Who are you yeeting?"] user: serenity::User,
 ) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "yeet").await?;
-    let a = ctx.author().display_name().to_string();
-    let b = user.display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
+    let b = escape_markdown(&user.display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_PLAYFUL, format!("**{a}** yeets **{b}** into the stratosphere")).await
 }
 
@@ -288,8 +298,8 @@ pub async fn teehee(
     #[description = "Who are you tee-hee-ing at?"] user: serenity::User,
 ) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "teehee").await?;
-    let a = ctx.author().display_name().to_string();
-    let b = user.display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
+    let b = escape_markdown(&user.display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_PLAYFUL, format!("**{a}** goes tee-hee at **{b}** ✌️")).await
 }
 
@@ -300,8 +310,8 @@ pub async fn nom(
     #[description = "Who do you want to nom on?"] user: serenity::User,
 ) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "nom").await?;
-    let a = ctx.author().display_name().to_string();
-    let b = user.display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
+    let b = escape_markdown(&user.display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_PLAYFUL, format!("**{a}** noms on **{b}** nom nom nom")).await
 }
 
@@ -312,8 +322,8 @@ pub async fn bite(
     #[description = "Who do you want to bite?"] user: serenity::User,
 ) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "bite").await?;
-    let a = ctx.author().display_name().to_string();
-    let b = user.display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
+    let b = escape_markdown(&user.display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_PLAYFUL, format!("**{a}** bites **{b}** — watch out!")).await
 }
 
@@ -324,8 +334,8 @@ pub async fn shake(
     #[description = "Who do you want to shake?"] user: serenity::User,
 ) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "shake").await?;
-    let a = ctx.author().display_name().to_string();
-    let b = user.display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
+    let b = escape_markdown(&user.display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_PLAYFUL, format!("**{a}** shakes **{b}** vigorously")).await
 }
 
@@ -336,8 +346,8 @@ pub async fn slap(
     #[description = "Who are you slapping?"] user: serenity::User,
 ) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "slap").await?;
-    let a = ctx.author().display_name().to_string();
-    let b = user.display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
+    let b = escape_markdown(&user.display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_AGGRESSIVE, format!("**{a}** slaps **{b}** — what did they do?!")).await
 }
 
@@ -348,7 +358,7 @@ pub async fn punch(
     #[description = "Who are you punching?"] user: serenity::User,
 ) -> Result<(), Error> {
     let (url, anime) = nekos_gif(ctx, "punch").await?;
-    let a = ctx.author().display_name().to_string();
-    let b = user.display_name().to_string();
+    let a = escape_markdown(&ctx.author().display_name().to_string());
+    let b = escape_markdown(&user.display_name().to_string());
     send_reaction(ctx, url, anime, COLOR_AGGRESSIVE, format!("**{a}** punches **{b}** right in the face 🥊")).await
 }
