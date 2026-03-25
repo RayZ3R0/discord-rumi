@@ -1,6 +1,6 @@
 [package]
 name = "discord-rumi"
-version = "0.1.0"
+version = "0.1.2"
 edition = "2021"
 description = "Production-grade Discord bot using serenity + poise"
 authors = ["RayZ3R0"]
@@ -52,6 +52,10 @@ anyhow = "1"
 # deserialize nekos.best API responses in the anime commands.
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+
+# ── URL encoding ────────────────────────────────────────────────────────────
+# Used for encoding search terms in Urban Dictionary API requests.
+urlencoding = "2"
 
 # ── AniList API client ────────────────────────────────────────────────────────
 # Typed Rust wrapper around the AniList GraphQL API. Used by the /animelist

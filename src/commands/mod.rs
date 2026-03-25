@@ -26,8 +26,9 @@ pub mod utility;
 pub fn all() -> Vec<poise::Command<AppData, Error>> {
     vec![
         utility::ping::ping(),
+        utility::define::define(),
         anime::anime(),
         react::react(),
-        anilist::animelist::animelist(),
+        anilist::anilist(),
     ]
 }
