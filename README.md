@@ -181,6 +181,147 @@ cargo run
 
 ---
 
+## Automatic Updates
+
+The bot includes an optional automatic update system that checks for new releases from GitHub and installs them without manual intervention.
+
+### How it works
+
+When enabled, the bot:
+
+1. **Checks for updates** periodically (default: every 24 hours)
+2. **Downloads** the correct binary for your system architecture
+3. **Creates a backup** of the current version (`.backup` extension)
+4. **Replaces** the running binary with the new version
+5. **Exits cleanly** so systemd or your process manager restarts it
+
+The update process is atomic and safe — if any step fails, the bot continues running on the current version.
+
+### Enabling automatic updates
+
+Add the following to your `.env` file:
+
+```bash
+# Enable automatic updates (default: false)
+AUTO_UPDATE_ENABLED=true
+
+# Optional: How often to check for updates in hours (default: 24)
+UPDATE_CHECK_HOURS=24
+```
+
+**Important**: Ensure your bot process has write access to its own binary location. See [Permission Setup](#permission-setup) below.
+
+### Permission Setup
+
+The bot needs to replace its own binary file. Here are three approaches:
+
+#### Option 1: Make directory writable (recommended)
+
+```bash
+# If your bot runs as user 'discord'
+sudo chown -R discord:discord /opt/discord-rumi
+sudo chmod 755 /opt/discord-rumi
+```
+
+#### Option 2: Run bot as your user
+
+If you're hosting on a VPS where you're the only user:
+
+```bash
+# In your systemd service file
+User=youruser
+WorkingDirectory=/home/youruser/discord-rumi
+ExecStart=/home/youruser/discord-rumi/discord-rumi
+```
+
+#### Option 3: Manual updates
+
+If you prefer manual control, simply leave `AUTO_UPDATE_ENABLED=false` (the default). You'll need to manually download new releases and restart the bot.
+
+### Systemd service configuration
+
+For automatic updates to work with systemd, use a generic binary name:
+
+```ini
+[Unit]
+Description=discord-rumi bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=discord
+WorkingDirectory=/opt/discord-rumi
+ExecStart=/opt/discord-rumi/discord-rumi  # Not the full filename
+Restart=always                             # Important: ensures restart after update
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+**Initial setup** (one-time):
+
+```bash
+cd /opt/discord-rumi
+# Rename or symlink to generic name
+mv discord-rumi-x86_64-linux-musl discord-rumi
+# Or: ln -s discord-rumi-x86_64-linux-musl discord-rumi
+```
+
+### Monitoring updates
+
+The bot logs all update activity:
+
+```bash
+# Watch logs to see update checks
+sudo journalctl -u discord-rumi -f
+```
+
+You'll see messages like:
+
+```
+INFO automatic updates enabled interval_hours=24
+INFO checking for updates...
+INFO update available current="0.1.2" new="0.1.3"
+INFO update installed successfully, restarting...
+```
+
+### Rolling back an update
+
+If an update causes issues, a backup is automatically created:
+
+```bash
+cd /opt/discord-rumi
+# Stop the bot
+sudo systemctl stop discord-rumi
+
+# Restore backup
+cp discord-rumi.backup discord-rumi
+
+# Restart
+sudo systemctl start discord-rumi
+```
+
+### Security considerations
+
+- **Updates are only pulled from GitHub Releases** — the bot never executes unsigned or untrusted code
+- The bot checks for version tags (e.g., `v0.2.0`) and compares semver to ensure it's actually newer
+- Each binary knows its target architecture at compile time and will only download the matching asset
+- Failed updates don't crash the bot — it logs the error and continues on the current version
+- You can disable updates at any time by setting `AUTO_UPDATE_ENABLED=false` and restarting
+
+### Disabling updates
+
+To disable automatic updates:
+
+1. Remove `AUTO_UPDATE_ENABLED=true` from `.env` (or set to `false`)
+2. Restart the bot: `sudo systemctl restart discord-rumi`
+
+The bot will continue to run but will no longer check for or install updates automatically.
+
+---
+
 ## Configuration reference
 
 | Variable | Required | Default | Description |
@@ -189,6 +330,10 @@ cargo run
 | `OWNER_IDS` | No | *(empty)* | Comma-separated user IDs with owner-level access |
 | `RUST_LOG` | No | `discord_twilight=info,serenity=warn,poise=warn` | Log filter — see [EnvFilter docs](https://docs.rs/tracing-subscriber/latest/tracing_subscriber/filter/struct.EnvFilter.html) |
 | `COMMAND_HASH_PATH` | No | `.command_hash` | Path to the command registration hash file |
+| `AUTO_UPDATE_ENABLED` | No | `false` | Enable automatic binary updates from GitHub Releases |
+| `UPDATE_CHECK_HOURS` | No | `24` | Hours between update checks (if auto-update enabled) |
+| `UPDATE_REPO_OWNER` | No | `RayZ3R0` | GitHub repo owner for updates (useful for forks) |
+| `UPDATE_REPO_NAME` | No | `discord-rumi` | GitHub repo name for updates |
 
 ---
 

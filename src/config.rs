@@ -25,6 +25,27 @@ pub struct Config {
     /// current command definitions, and only calls the Discord registration
     /// API when the two differ. Defaults to `.command_hash`.
     pub command_hash_path: String,
+
+    /// Enable automatic updates from GitHub Releases.
+    ///
+    /// When enabled, the bot periodically checks for new releases and
+    /// automatically downloads and installs them. Defaults to `false`.
+    pub auto_update_enabled: bool,
+
+    /// Hours between automatic update checks.
+    ///
+    /// Only used when `auto_update_enabled` is true. Defaults to 24 hours.
+    pub update_check_interval_hours: u64,
+
+    /// GitHub repository owner for release updates.
+    ///
+    /// Defaults to `RayZ3R0`. Change this if running a fork.
+    pub update_repo_owner: String,
+
+    /// GitHub repository name for release updates.
+    ///
+    /// Defaults to `discord-rumi`. Change this if running a fork.
+    pub update_repo_name: String,
 }
 
 impl Config {
@@ -46,10 +67,30 @@ impl Config {
         let command_hash_path =
             std::env::var("COMMAND_HASH_PATH").unwrap_or_else(|_| ".command_hash".to_owned());
 
+        let auto_update_enabled = std::env::var("AUTO_UPDATE_ENABLED")
+            .unwrap_or_else(|_| "false".to_owned())
+            .parse::<bool>()
+            .unwrap_or(false);
+
+        let update_check_interval_hours = std::env::var("UPDATE_CHECK_HOURS")
+            .unwrap_or_else(|_| "24".to_owned())
+            .parse::<u64>()
+            .unwrap_or(24);
+
+        let update_repo_owner =
+            std::env::var("UPDATE_REPO_OWNER").unwrap_or_else(|_| "RayZ3R0".to_owned());
+
+        let update_repo_name =
+            std::env::var("UPDATE_REPO_NAME").unwrap_or_else(|_| "discord-rumi".to_owned());
+
         Ok(Self {
             token,
             owner_ids,
             command_hash_path,
+            auto_update_enabled,
+            update_check_interval_hours,
+            update_repo_owner,
+            update_repo_name,
         })
     }
 }

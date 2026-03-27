@@ -1,6 +1,6 @@
 [package]
 name = "discord-rumi"
-version = "0.1.2"
+version = "0.2.0"
 edition = "2021"
 description = "Production-grade Discord bot using serenity + poise"
 authors = ["RayZ3R0"]
@@ -65,6 +65,22 @@ anilist_moe = "0.3.3"
 # ── Command hash-based auto-registration ──────────────────────────────────────
 sha2 = "0.10"
 hex = "0.4"
+
+# ── Automatic self-update system ──────────────────────────────────────────────
+# Enables the bot to download and install new releases from GitHub automatically.
+# Uses pure-Rust TLS (rustls) for consistency with serenity's backend choice.
+# Supports tar.gz archives with gzip compression (standard Linux release format).
+self_update = { version = "0.42", default-features = false, features = [
+    "rustls",
+    "archive-tar",
+    "compression-flate2",
+] }
+
+# Dependencies for self_update functionality (these are used directly in our code)
+semver = "1.0"      # Version comparison
+tempfile = "3"      # Temporary directory for downloads
+flate2 = "1"        # Gzip decompression
+tar = "0.4"         # Tar archive extraction
 
 [profile.release]
 # Link-time optimisation — smaller, faster binary on constrained hosting.

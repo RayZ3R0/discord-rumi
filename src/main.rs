@@ -26,6 +26,7 @@ mod data;
 mod error;
 mod events;
 mod registration;
+mod updater;
 
 use config::Config;
 use data::AppData;
@@ -71,7 +72,35 @@ async fn run() -> anyhow::Result<()> {
 
     tracing::info!("configuration loaded");
 
-    // ── 3. Poise framework ──────────────────────────────────────────────────
+    // ── 3.5. Automatic updates ──────────────────────────────────────────────
+    //
+    // Spawn background task that periodically checks for new releases and
+    // automatically installs them. Disabled by default — must be explicitly
+    // enabled via AUTO_UPDATE_ENABLED=true in .env or environment.
+    //
+    // The update task runs independently and exits the process (code 0) when a
+    // new version is successfully installed, triggering systemd to restart the
+    // bot with the new binary.
+    if config.auto_update_enabled {
+        tracing::info!(
+            interval_hours = config.update_check_interval_hours,
+            repo = format!("{}/{}", config.update_repo_owner, config.update_repo_name),
+            "automatic updates enabled"
+        );
+
+        let update_config = updater::UpdateConfig {
+            repo_owner: config.update_repo_owner.clone(),
+            repo_name: config.update_repo_name.clone(),
+            check_interval_hours: config.update_check_interval_hours,
+            current_version: env!("CARGO_PKG_VERSION").to_owned(),
+        };
+
+        tokio::spawn(updater::spawn_update_task(update_config));
+    } else {
+        tracing::debug!("automatic updates disabled");
+    }
+
+    // ── 4. Poise framework ──────────────────────────────────────────────────
     let owner_ids = config.owner_ids.clone();
     let command_hash_path = config.command_hash_path.clone();
 
@@ -110,7 +139,7 @@ async fn run() -> anyhow::Result<()> {
         })
         .build();
 
-    // ── 4. Serenity client ──────────────────────────────────────────────────
+    // ── 5. Serenity client ──────────────────────────────────────────────────
     //
     // Intents: GUILDS is the minimum required for slash commands to function.
     // It provides guild create/delete/update events and channel/role data that
@@ -130,7 +159,7 @@ async fn run() -> anyhow::Result<()> {
         .await
         .map_err(|e| anyhow::anyhow!("failed to build serenity client: {}", e))?;
 
-    // ── 5. Start shards ─────────────────────────────────────────────────────
+    // ── 6. Start shards ─────────────────────────────────────────────────────
     //
     // `start_autosharded` asks Discord for the recommended shard count and
     // spawns one shard runner per shard. At 200-300 guilds Discord will
@@ -147,7 +176,7 @@ async fn run() -> anyhow::Result<()> {
         }
     });
 
-    // ── 6. Graceful shutdown ────────────────────────────────────────────────
+    // ── 7. Graceful shutdown ────────────────────────────────────────────────
     wait_for_signal().await;
 
     tracing::info!("shutdown signal received — closing all shards");

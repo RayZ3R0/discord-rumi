@@ -1,21 +1,14 @@
-//! `/animelist` command — display an AniList user's anime and manga statistics.
-
 use anilist_moe::{
     client::AniListClient,
-    enums::media_list::MediaListStatus,
     errors::AniListError,
-    objects::{stats::UserStatistics, user::User},
+    objects::user::User,
 };
 use poise::serenity_prelude as serenity;
 use serde::Serialize;
 
-use crate::data::AppData;
+use super::utils::{completion_pct, escape_markdown, fmt_duration, top_genres, COLOR};
+use super::Context;
 use crate::error::Error;
-
-type Context<'a> = poise::Context<'a, AppData, Error>;
-
-/// Embed accent color — deep crimson, matching the AniList brand palette.
-const COLOR: u32 = 0x8B0000;
 
 /// Query to resolve a username to a user ID + profile metadata.
 /// Replaces `anilist_moe`'s fetch_one.graphql which hardcodes `$id: Int!`
@@ -80,78 +73,9 @@ struct StatsVars {
     id: i32,
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-/// Convert a raw minutes value into a human-readable string like
-/// `"12d 3h 45m"`, dropping leading zero components except for the last.
-fn fmt_duration(total_minutes: i32) -> String {
-    let total = total_minutes.max(0) as u32;
-    let days = total / 1440;
-    let hours = (total % 1440) / 60;
-    let mins = total % 60;
-
-    match (days, hours, mins) {
-        (0, 0, m) => format!("{m}m"),
-        (0, h, m) => format!("{h}h {m}m"),
-        (d, h, m) => format!("{d}d {h}h {m}m"),
-    }
-}
-
-/// Pull the top N genre names from the (already-sorted) genres vec.
-fn top_genres(stats: &UserStatistics, n: usize) -> Vec<String> {
-    stats
-        .genres
-        .as_deref()
-        .unwrap_or(&[])
-        .iter()
-        .take(n)
-        .filter_map(|g| g.genre.clone())
-        .collect()
-}
-
-/// Compute the anime completion percentage, guarded against division by zero
-/// and negative results.
-///
-/// Logic: `floor(100 − (dropped_minutes / completed_minutes) × 100)`.
-/// Returns `None` when there is no completed-minutes data to base this on.
-fn completion_pct(stats: &UserStatistics) -> Option<u32> {
-    let statuses = stats.statuses.as_deref()?;
-
-    let completed_mins = statuses
-        .iter()
-        .find(|s| matches!(s.status, Some(MediaListStatus::Completed)))
-        .and_then(|s| s.minutes_watched)
-        .unwrap_or(0);
-
-    let dropped_mins = statuses
-        .iter()
-        .find(|s| matches!(s.status, Some(MediaListStatus::Dropped)))
-        .and_then(|s| s.minutes_watched)
-        .unwrap_or(0);
-
-    if completed_mins == 0 {
-        return None;
-    }
-
-    let pct: f64 = 100.0 - (dropped_mins as f64 / completed_mins as f64) * 100.0;
-    Some(pct.floor().clamp(0.0, 100.0) as u32)
-}
-
-/// Escape markdown characters in user-provided text to prevent unintended formatting.
-/// This escapes *, _, ~, `, and other Discord markdown characters.
-fn escape_markdown(text: &str) -> String {
-    text.replace('_', "\\_")
-        .replace('*', "\\*")
-        .replace('~', "\\~")
-        .replace('`', "\\`")
-        .replace('>', "\\>")
-}
-
-// ── Command ───────────────────────────────────────────────────────────────────
-
 /// Display AniList anime and manga statistics for a user.
 #[poise::command(slash_command)]
-pub async fn animelist(
+pub async fn user(
     ctx: Context<'_>,
     #[description = "AniList username"] username: String,
 ) -> Result<(), Error> {
@@ -167,7 +91,7 @@ pub async fn animelist(
         .await
     {
         Ok(u) => {
-            tracing::debug!(user = ?u, "animelist: got user response");
+            tracing::debug!(user = ?u, "anilist::user: got user response");
             u
         }
         Err(AniListError::NotFound) => {
@@ -199,7 +123,7 @@ pub async fn animelist(
         .await
     {
         Ok(u) => {
-            tracing::debug!(user = ?u, "animelist: got stats response");
+            tracing::debug!(user = ?u, "anilist::user: got stats response");
             u
         }
         Err(e) => return Err(anyhow::anyhow!(e)),
@@ -266,56 +190,68 @@ pub async fn animelist(
         embed = embed.image(url);
     }
 
-    // Anime stats field
+    // Anime stats
     let anime_body = format!(
-        "**{anime_count}** entries · **{anime_score:.1}** avg\n\
-         **{}** watched · **{anime_episodes}** eps",
+        "**{}** entries · **{:.1}** avg score\n**{}** watched · **{}** episodes",
+        anime_count,
+        anime_score,
         fmt_duration(anime_minutes),
+        anime_episodes,
     );
-    embed = embed.field("📺 Anime", anime_body, true);
+    embed = embed.field("Anime", anime_body, true);
 
-    // Manga stats field
+    // Manga stats
     let manga_body = format!(
-        "**{manga_count}** entries · **{manga_score:.1}** avg\n\
-         **{manga_chapters}** chapters · **{manga_volumes}** vols",
+        "**{}** entries · **{:.1}** avg score\n**{}** chapters · **{}** volumes",
+        manga_count,
+        manga_score,
+        manga_chapters,
+        manga_volumes,
     );
-    embed = embed.field("📖 Manga", manga_body, true);
+    embed = embed.field("Manga", manga_body, true);
 
-    // Weeb Tendencies field
-    let mut tendencies: Vec<String> = Vec::new();
+    // Build details section
+    let mut details: Vec<String> = Vec::new();
 
     if !anime_top_genres.is_empty() {
         let escaped_genres: Vec<String> = anime_top_genres.iter().map(|g| escape_markdown(g)).collect();
-        tendencies.push(format!("**Top anime:** {}", escaped_genres.join(", ")));
+        details.push(format!("**Top anime:** {}", escaped_genres.join(", ")));
     }
+
     if !manga_top_genres.is_empty() {
         let escaped_genres: Vec<String> = manga_top_genres.iter().map(|g| escape_markdown(g)).collect();
-        tendencies.push(format!("**Top manga:** {}", escaped_genres.join(", ")));
+        details.push(format!("**Top manga:** {}", escaped_genres.join(", ")));
     }
+
     if let Some(g) = anime_most_watched_genre {
-        tendencies.push(format!("**Most watched:** {}", escape_markdown(&g)));
+        details.push(format!("**Most watched:** {}", escape_markdown(&g)));
     }
+
     if let Some(g) = anime_least_liked_genre {
-        tendencies.push(format!("**Least watched:** {}", escape_markdown(&g)));
+        details.push(format!("**Least watched:** {}", escape_markdown(&g)));
     }
+
     if let Some(g) = manga_fav_genre {
-        tendencies.push(format!("**Most read:** {}", escape_markdown(&g)));
+        details.push(format!("**Most read:** {}", escape_markdown(&g)));
     }
+
     if let Some(pct) = anime_completion {
-        tendencies.push(format!("**Completion:** {pct}%"));
+        details.push(format!("**Completion:** {}%", pct));
     }
+
     if let Some(y) = anime_fav_year {
-        tendencies.push(format!("**Fav anime era:** {y}"));
+        details.push(format!("**Fav anime era:** {}", y));
     }
+
     if let Some(y) = manga_fav_year {
-        tendencies.push(format!("**Fav manga era:** {y}"));
+        details.push(format!("**Fav manga era:** {}", y));
     }
 
-    if !tendencies.is_empty() {
-        embed = embed.field("📊 Weeb Tendencies", tendencies.join("\n"), false);
+    if !details.is_empty() {
+        embed = embed.field("Statistics", details.join("\n"), false);
     }
 
-    tracing::debug!(?embed, "animelist: final embed before sending");
+    tracing::debug!(?embed, "anilist::user: final embed before sending");
     ctx.send(poise::CreateReply::default().embed(embed)).await?;
     Ok(())
 }
