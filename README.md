@@ -368,7 +368,7 @@ Detailed guides for extending the bot are in the `docs/` directory:
 The GitHub Actions workflow builds release binaries automatically when a version tag is pushed:
 
 ```bash
-git tag v0.2.0
+git tag v0.2.3
 git push --tags
 ```
 
