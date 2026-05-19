@@ -25,9 +25,7 @@ pub async fn echo(
         ));
     }
 
-    let rules = r#"Okay, I've drafted the rules proper now. What y'all think?
-
-1. **Server Theme**
+    let rules = r#"1. **Server Theme**
     This server is dedicated to **Kurumi Tokisaki** from Date a Live. While the discussion of the anime and its characters is welcome, attempts to provoke, antagonize, insult or disrupt the community or its interests are not tolerated.
 
 2. **Language of Communication**
