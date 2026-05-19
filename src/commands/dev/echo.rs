@@ -52,13 +52,10 @@ pub async fn echo(
         return Ok(());
     }
 
-    // Echo the text back as-is in a code block to preserve formatting
-    // Using backticks/code block ensures Discord won't interpret formatting
-    let response = format!("```\n{}\n```", text);
-
+    // Echo the text back exactly as provided
     ctx.send(
         poise::CreateReply::default()
-            .content(response)
+            .content(text)
             .ephemeral(false), // Public response so dev can verify output
     )
     .await?;
