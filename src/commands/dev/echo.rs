@@ -3,18 +3,16 @@ use crate::error::Error;
 
 type Context<'a> = poise::Context<'a, AppData, Error>;
 
-/// Developer-only command to echo back text exactly as provided.
+/// Developer-only command to post server rules.
 ///
-/// This command is restricted to a specific developer user ID for testing and
-/// debugging purposes. It safely echoes back the provided text without any
-/// modifications, preserving all content character-by-character.
+/// This command is restricted to a specific developer user ID and posts
+/// pre-formatted server rules to the channel.
 #[poise::command(
     slash_command,
-    description_localized("en-US", "Echo back text (dev only)")
+    description_localized("en-US", "Post server rules (dev only)")
 )]
 pub async fn echo(
     ctx: Context<'_>,
-    #[description = "Text to echo back"] text: String,
 ) -> Result<(), Error> {
     // Developer user ID constant
     const DEV_USER_ID: u64 = 636598760616624128;
@@ -27,38 +25,34 @@ pub async fn echo(
         ));
     }
 
-    // Validate text is not empty
-    if text.is_empty() {
-        ctx.send(
-            poise::CreateReply::default()
-                .content("Error: text cannot be empty")
-                .ephemeral(true),
-        )
-        .await?;
-        return Ok(());
-    }
+    let rules = r#"Okay, I've drafted the rules proper now. What y'all think?
 
-    // Validate text length (Discord has a 2000 character limit per message)
-    if text.len() > 2000 {
-        ctx.send(
-            poise::CreateReply::default()
-                .content(format!(
-                    "Error: text exceeds 2000 character limit (provided: {} characters)",
-                    text.len()
-                ))
-                .ephemeral(true),
-        )
-        .await?;
-        return Ok(());
-    }
+1. **Server Theme**
+    This server is dedicated to **Kurumi Tokisaki** from Date a Live. While the discussion of the anime and its characters is welcome, attempts to provoke, antagonize, insult or disrupt the community or its interests are not tolerated.
 
-    // Echo the text back exactly as provided
+2. **Language of Communication**
+    English 🇬🇧/🇺🇲 is the primary language of this server. Non-English conversations belong in <#901338477021499413>. 
+
+3. **Code of Conduct**
+    Use common sense and respect others. Harassment, trolling, excessive toxicity, disruptive behavior, attention-seeking, drama-farming, inappropriate conduct, or behavior negatively affecting the server atmosphere may result in moderation action.
+    Keep sensitive or divisive topics, excessive personal matters, and off-topic discussions to appropriate channels or avoid them entirely.
+    Use channels for their intended purpose.
+
+4. **Appropriate Content**
+    Do not engage in or promote behavior violating Discord's Terms of Service. 
+    NSFW content is only permitted in designated NSFW channels.
+    Gore, exploitative or illegal content is not allowed.
+
+5. **Staff Authority**
+    Staff reserve the right to interpret and enforce the rules as necessary to maintain the server environment and community standards. Users may be removed for behavior deemed harmful, disruptive, or incompatible with the server atmosphere, even if not explicitly covered by these rules."#;
+
     ctx.send(
         poise::CreateReply::default()
-            .content(text)
-            .ephemeral(false), // Public response so dev can verify output
+            .content(rules)
+            .ephemeral(false),
     )
     .await?;
 
     Ok(())
 }
+
