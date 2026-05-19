@@ -3,6 +3,7 @@ use poise::serenity_prelude as serenity;
 use crate::data::AppData;
 use crate::error::Error;
 
+pub mod message_command;
 pub mod ready;
 
 /// Top-level gateway event dispatcher.
@@ -41,6 +42,12 @@ pub async fn handle(
         serenity::FullEvent::Ready { data_about_bot } => {
             if let Err(e) = ready::handle(ctx, data_about_bot, framework).await {
                 tracing::error!(error = ?e, "Ready handler failed");
+            }
+        }
+
+        serenity::FullEvent::Message { new_message } => {
+            if let Err(e) = message_command::handle(ctx, new_message).await {
+                tracing::error!(error = ?e, "Message handler failed");
             }
         }
 

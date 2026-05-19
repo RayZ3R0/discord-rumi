@@ -143,7 +143,11 @@ async fn run() -> anyhow::Result<()> {
     //
     // Intents: GUILDS is the minimum required for slash commands to function.
     // It provides guild create/delete/update events and channel/role data that
-    // feeds the cache. No privileged intents are requested.
+    // feeds the cache. GUILD_MESSAGES is added to receive message events for
+    // the prefix-based say command (though MESSAGE_CONTENT is not needed since
+    // the bot only reads messages where it's mentioned).
+    //
+    // No other privileged intents are requested.
     //
     // To add intents later, use the bitwise OR operator:
     //   intents | serenity::GatewayIntents::GUILD_MEMBERS
@@ -152,7 +156,7 @@ async fn run() -> anyhow::Result<()> {
     // already sets max_messages=0. This caches guild/channel/role metadata
     // (needed for permission checks and command routing) while preventing the
     // unbounded per-channel message buffers that cause RAM growth at scale.
-    let intents = serenity::GatewayIntents::GUILDS;
+    let intents = serenity::GatewayIntents::GUILDS | serenity::GatewayIntents::GUILD_MESSAGES;
 
     let mut client = serenity::ClientBuilder::new(&config.token, intents)
         .framework(framework)
